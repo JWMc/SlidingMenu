@@ -29,6 +29,8 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnCloseBeginListener;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenBeginListener;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 //import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnCloseListener;
@@ -94,6 +96,9 @@ public class CustomViewAbove extends ViewGroup {
 
 	private OnPageChangeListener mOnPageChangeListener;
 	private OnPageChangeListener mInternalPageChangeListener;
+
+    private OnCloseBeginListener mCloseBeginListener;
+    private OnOpenBeginListener mOpenBeginListener;
 
 	//	private OnCloseListener mCloseListener;
 	//	private OnOpenListener mOpenListener;
@@ -198,7 +203,7 @@ public class CustomViewAbove extends ViewGroup {
 	 * @param item Item index to select
 	 */
 	public void setCurrentItem(int item) {
-		setCurrentItemInternal(item, true, false);
+		setCurrentItem(item, true);
 	}
 
 	/**
@@ -208,6 +213,7 @@ public class CustomViewAbove extends ViewGroup {
 	 * @param smoothScroll True to smoothly scroll to the new item, false to transition immediately
 	 */
 	public void setCurrentItem(int item, boolean smoothScroll) {
+        performOnBeginCallbacks();
 		setCurrentItemInternal(item, smoothScroll, false);
 	}
 
@@ -242,6 +248,8 @@ public class CustomViewAbove extends ViewGroup {
 			completeScroll();
 			scrollTo(destX, 0);
 		}
+
+
 	}
 
 	/**
@@ -253,6 +261,14 @@ public class CustomViewAbove extends ViewGroup {
 	public void setOnPageChangeListener(OnPageChangeListener listener) {
 		mOnPageChangeListener = listener;
 	}
+
+    public void setOnOpenBeginListener(OnOpenBeginListener l) {
+        mOpenBeginListener = l;
+    }
+    public void setOnCloseBeginListener(OnCloseBeginListener l) {
+        mCloseBeginListener = l;
+    }
+
 	/*
 	public void setOnOpenListener(OnOpenListener l) {
 		mOpenListener = l;
@@ -803,7 +819,7 @@ public class CustomViewAbove extends ViewGroup {
 	public void scrollTo(int x, int y) {
 		super.scrollTo(x, y);
 		mScrollX = x;
-		mViewBehind.scrollBehindTo(mContent, x, y);	
+		mViewBehind.scrollBehindTo(mContent, x, y);
 		((SlidingMenu)getParent()).manageLayers(getPercentOpen());
 	}
 
@@ -877,6 +893,8 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	private void startDrag() {
+        performOnBeginCallbacks();
+
 		mIsBeingDragged = true;
 		mQuickReturn = false;
 	}
@@ -1030,4 +1048,16 @@ public class CustomViewAbove extends ViewGroup {
 		return false;
 	}
 
+    public void performOnBeginCallbacks() {
+        if(isMenuOpen()) {
+            if (mCloseBeginListener != null) {
+                mCloseBeginListener.onCloseBegin();
+            }
+        }
+        else {
+            if (mOpenBeginListener != null) {
+                mOpenBeginListener.onOpenBegin();
+            }
+        }
+    }
 }
