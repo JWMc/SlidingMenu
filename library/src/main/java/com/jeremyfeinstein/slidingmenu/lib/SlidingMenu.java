@@ -354,7 +354,8 @@ public class SlidingMenu extends RelativeLayout {
                 mViewForBackground = decorChild;
                 if (mAddBackground)
                     decorChild.setBackgroundResource(mBackground);
-                decor.removeView(decorChild);
+                //decor.removeView(decorChild);
+				decor.removeAllViewsInLayout();
                 decor.addView(this);
                 setContent(decorChild);
                 break;
@@ -364,7 +365,8 @@ public class SlidingMenu extends RelativeLayout {
                 ViewGroup contentParent = (ViewGroup)activity.findViewById(android.R.id.content);
                 View content = contentParent.getChildAt(0);
                 mViewForBackground = content;
-                contentParent.removeView(content);
+                //contentParent.removeView(content);
+				contentParent.removeAllViewsInLayout();
                 contentParent.addView(this);
                 setContent(content);
                 // save people from having transparent backgrounds
